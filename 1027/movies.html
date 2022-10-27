@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h3></h3>
+  <p>
+  </p>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const h3 = document.querySelector('h3')
+    h3.innerText = '평점 8.0 이상의 영화들'
+    const BASE_URL = 'https://api.themoviedb.org/3/movie/popular'
+    const P = document.querySelector('p')
+    axios ({
+      url : BASE_URL,
+      method : 'get',
+      params: {
+        api_key : '9da7ae64abaf7f23cd60ddbaebcfb205',
+        language : 'ko-KR',
+        page: 3,
+      },
+    })
+    .then(res => {
+      const movies = res.data.results
+      for(let movie of movies) {
+        if(movie.vote_average >= 8.0) {
+          const upmovie = movie.title
+          const li = document.createElement('li')
+          li.innerText = upmovie
+          P.appendChild(li)
+          // upmovie.forEach((movieTitle) => {
+          //   const li = document.createElement('li')
+          //   li.innerText = movieTitle
+          //   P.appendChild(li)
+          // });
+          
+        }
+      }
+    })
+  </script>
+</body>
+</html>
