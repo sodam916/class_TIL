@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .finish {
+      text-decoration: line-through;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+  <h1>Todo List</h1>
+  <div id="app">
+    <select v-model="status">
+      <option value="all">전체</option>
+      <option value="ing">진행중</option>
+      <option value="done">완료</option>
+    </select>
+    <input type="text" v-model.trim="todoinput"> 
+    <button @click="addTodo">+</button>
+    <ul>
+      <li v-for="todo in todosByStatus" :key="todo.id">
+        <input type="checkbox" @click="toggleTodo(todo)" :checked="todo.completed">
+        <span :class="{finish:todo.completed}">{{ todo.title }}</span>
+      </li>
+    </ul>
+    <button @click="deleteTodo">삭제</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    const TODO_APP_KEY = 'vue-todo-app'
+    const todoStorage = {
+      save : function (data) {
+        //local storage에 저장 > jason 형태로 저장
+        window.localStorage.setItem(TODO_APP_KEY,JSON.stringify(data))
+      },
+      fetch : function () {
+        //local storage에서 불러옴
+        return JSON.parse(window.localStorage.getItem(TODO_APP_KEY)) || []
+      },
+    }
+    const app = new Vue({
+      el: '#app',
+      data: {
+        status: 'all',
+        todoinput: '',
+        todos: [
+          // { title: '밥먹기', completed: false}, 이런 형태로 저장
+        ],
+        id: new Date().getTime(),
+      },
+      methods: {
+        addTodo: function() {
+          if (!this.todoinput) {
+            alert('내용을 입력하세요')
+          } else{
+          const todo = {
+            title: this.todoinput,
+            completed: false,
+          }
+          this.todos.push(todo)
+          this.todoinput = ''
+        }},
+        toggleTodo: function(todo) {
+          todo.completed = !todo.completed
+        },
+        deleteTodo: function() {
+          this.todos = this.todos.filter(todo => {
+            return !todo.completed
+          })
+        }
+      },
+      computed: {
+        todosByStatus : function () {
+          return this.todos.filter(todo => {
+            if(this.status === 'ing') {
+              return !todo.completed
+            } else if (this.status === 'done') {
+              return todo.completed
+            } else {
+              return true
+            }
+          }) 
+          
+        }
+      },
+      watch: {
+        todos: {
+          deep: true,
+          handler: function (todos) {
+            todoStorage.save(todos)
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
